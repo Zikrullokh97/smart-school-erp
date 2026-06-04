@@ -1,0 +1,47 @@
+# Smart School Cloud ERP
+
+Smart School Cloud ERP is a multi-tenant SaaS platform for Kyrgyzstan schools. The platform combines school administration, attendance, parent engagement, AI reporting, scheduling, and offline-first mobile workflows in one production-oriented system.
+
+## Product Scope
+
+- Manage schools, users, roles, students, teachers, parents, classes, schedules, attendance, notifications, and reports.
+- Support Kyrgyzstan school operations with multi-language readiness for Kyrgyz, Russian, and English interfaces.
+- Provide secure tenant isolation, audit trails, RBAC, and compliance-minded operational controls.
+- Enable offline-first mobile usage for attendance capture and parent-facing workflows.
+- Integrate AI features for reporting, summarization, speech processing, and face identification infrastructure.
+
+## Monorepo Layout
+
+| Path | Purpose |
+| --- | --- |
+| `apps/backend` | FastAPI service, domain modules, SQLAlchemy models, Alembic migrations, API tests |
+| `apps/web` | Next.js admin and school staff dashboard |
+| `apps/mobile` | Flutter mobile app for teachers, parents, and attendance operators |
+| `packages/shared-contracts` | Cross-platform API schemas, event names, and generated client contracts |
+| `packages/config` | Shared linting, formatting, and build configuration |
+| `infra` | Docker, Kubernetes, observability, and deployment assets |
+| `docs` | Architecture, product, API, operations, testing, and progress documentation |
+| `tooling` | Repository automation that supports builds, tests, and release gates |
+| `tools` | Lightweight scripts used before full workspace toolchains exist |
+
+## Phase Status
+
+The active roadmap is maintained in [ROADMAP.md](ROADMAP.md). Each completed phase has a progress report under `docs/progress`.
+
+## Local Validation
+
+Phase 1 validation can be run from the repository root:
+
+```bash
+pnpm test:phase1
+```
+
+The validation checks that the monorepo foundation, architecture documentation, agent instructions, and roadmap are present and internally consistent.
+
+## Engineering Principles
+
+- Tenant isolation is enforced in application services and database access patterns.
+- Every user-facing feature includes API validation, tests, documentation, and auditability.
+- Offline-capable workflows are designed with deterministic sync, idempotency, and conflict resolution.
+- Event-driven integrations use durable outbox processing before external side effects.
+- Security, observability, and deployment automation are first-class deliverables, not release cleanup.

@@ -1,0 +1,46 @@
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node
+node_modules/
+.next/
+dist/
+coverage/
+.turbo/
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Runtime
+logs/
+tmp/

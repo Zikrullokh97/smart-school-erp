@@ -1,0 +1,17 @@
+{
+  "name": "smart-school-cloud-erp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-tenant Smart School Cloud ERP for Kyrgyzstan schools.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.12.1",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "docs:validate": "node tools/validate-phase1.mjs",
+    "test": "pnpm docs:validate",
+    "test:phase1": "pnpm docs:validate"
+  }
+}
