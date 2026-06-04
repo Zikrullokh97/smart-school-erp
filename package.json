@@ -11,7 +11,9 @@
   },
   "scripts": {
     "docs:validate": "node tools/validate-phase1.mjs",
-    "test": "pnpm docs:validate",
-    "test:phase1": "pnpm docs:validate"
+    "test": "node tools/run-tests.mjs",
+    "test:backend": "uv --directory apps/backend run pytest",
+    "test:phase1": "pnpm docs:validate",
+    "test:phase2": "node tools/run-tests.mjs"
   }
 }

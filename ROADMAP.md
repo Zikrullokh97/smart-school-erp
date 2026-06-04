@@ -11,8 +11,8 @@
 | Phase | Name | Status | Completion Evidence |
 | --- | --- | --- | --- |
 | 1 | Repository initialization, monorepo setup, folder structure, README, architecture docs | Complete | `docs/progress/phase-01-repository-foundation.md` |
-| 2 | Database design, SQLAlchemy models, Alembic migrations, seed data | Next | Pending |
-| 3 | Authentication, JWT, RBAC, user management, school management | Not started | Pending |
+| 2 | Database design, SQLAlchemy models, Alembic migrations, seed data | Complete | `docs/progress/phase-02-database-foundation.md` |
+| 3 | Authentication, JWT, RBAC, user management, school management | Next | Pending |
 | 4 | Student module | Not started | Pending |
 | 5 | Teacher module | Not started | Pending |
 | 6 | Parent module | Not started | Pending |
@@ -33,4 +33,4 @@
 
 ## Current Milestone
 
-Phase 2 builds the backend database foundation: Python project setup, tenant-aware schema design, SQLAlchemy models, Alembic migrations, and seed data.
+Phase 3 builds authentication, JWT session management, RBAC enforcement, user management APIs, and school management APIs.

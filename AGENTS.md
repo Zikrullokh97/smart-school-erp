@@ -42,6 +42,14 @@ Build Smart School Cloud ERP as a production-ready multi-tenant SaaS platform fo
 - Operations guidance lives in `docs/operations`.
 - Testing strategy and evidence live in `docs/testing`.
 
+## Database Conventions
+
+- Use UUID primary keys for tenant-owned and platform records.
+- Use `tenant_id` on every tenant-owned table and include tenant scope in uniqueness rules.
+- Use SQLAlchemy typed ORM models as the source for application metadata and Alembic migrations as immutable deployment history.
+- Keep seed data idempotent and permission mappings explicit.
+- Add audit and outbox records for state-changing features introduced after the database foundation.
+
 ## Definition of Done
 
 A phase is complete only when tests pass, documentation is updated, `ROADMAP.md` reflects progress, and the phase has been committed.

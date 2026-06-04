@@ -19,3 +19,18 @@ The backend app contains the FastAPI service for Smart School Cloud ERP.
 - PostgreSQL with TimescaleDB and PGVector extensions
 - Redis
 - Pytest
+
+## Phase 2 Database Foundation
+
+The backend currently includes:
+
+- SQLAlchemy typed ORM metadata for the core platform schema.
+- Alembic configuration and the initial PostgreSQL migration.
+- Seed data definitions for platform permissions and system roles.
+- Pytest coverage for metadata conventions, PostgreSQL DDL compilation, migration discovery, and seed consistency.
+
+Run backend tests from the repository root:
+
+```bash
+uv run --project apps/backend pytest
+```

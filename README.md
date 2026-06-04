@@ -30,13 +30,13 @@ The active roadmap is maintained in [ROADMAP.md](ROADMAP.md). Each completed pha
 
 ## Local Validation
 
-Phase 1 validation can be run from the repository root:
+Current validation can be run from the repository root:
 
 ```bash
-pnpm test:phase1
+pnpm test
 ```
 
-The validation checks that the monorepo foundation, architecture documentation, agent instructions, and roadmap are present and internally consistent.
+The validation checks repository documentation gates, backend linting, and backend database foundation tests. On Windows PowerShell, use `pnpm.cmd test` if script execution policy blocks the PowerShell shim.
 
 ## Engineering Principles
 
@@ -45,3 +45,7 @@ The validation checks that the monorepo foundation, architecture documentation, 
 - Offline-capable workflows are designed with deterministic sync, idempotency, and conflict resolution.
 - Event-driven integrations use durable outbox processing before external side effects.
 - Security, observability, and deployment automation are first-class deliverables, not release cleanup.
+
+## Backend Database Foundation
+
+The backend database foundation lives in `apps/backend`. It defines tenant-aware SQLAlchemy models, Alembic migrations, and seed data for permissions and system roles. The first schema migration enables PostgreSQL extensions required by the architecture and creates the core tables used by later feature phases.
