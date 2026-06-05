@@ -387,6 +387,7 @@ def upgrade() -> None:
         sa.Column("phone_number", sa.String(length=40), nullable=False),
         sa.Column("preferred_language", sa.String(length=16), nullable=False),
         jsonb_column("profile"),
+        jsonb_column("ui_preferences"),
         *timestamps(),
         sa.PrimaryKeyConstraint("id", name="pk_parent_profiles"),
         sa.UniqueConstraint("tenant_id", "user_id", name="uq_parent_profiles_user"),
@@ -788,6 +789,33 @@ def upgrade() -> None:
     op.create_index("ix_ai_reports_reviewed_by_user_id", "ai_reports", ["reviewed_by_user_id"])
 
     op.create_table(
+        "ai_review_actions",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column(
+            "ai_report_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("ai_reports.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "actor_user_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+        sa.Column("decision", sa.String(length=80), nullable=False),
+        sa.Column("comment", sa.String(length=2000), nullable=True),
+        jsonb_column("explainability"),
+        jsonb_column("metadata"),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_ai_review_actions"),
+        sa.UniqueConstraint("tenant_id", "ai_report_id", "actor_user_id", "created_at", name="uq_ai_review_actions"),
+    )
+    create_tenant_index("ai_review_actions")
+    op.create_index("ix_ai_review_actions_ai_report_id", "ai_review_actions", ["ai_report_id"])
+
+    op.create_table(
         "sync_devices",
         uuid_pk(),
         tenant_fk(),
@@ -807,6 +835,114 @@ def upgrade() -> None:
     )
     create_tenant_index("sync_devices")
     op.create_index("ix_sync_devices_user_id", "sync_devices", ["user_id"])
+
+    op.create_table(
+        "gamification_profiles",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column(
+            "student_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("students.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column("xp_total", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("level", sa.Integer(), nullable=False, server_default="1"),
+        sa.Column("streak_count", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("streak_start_date", sa.Date(), nullable=True),
+        sa.Column("last_activity_at", sa.DateTime(timezone=True), nullable=True),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_gamification_profiles"),
+        sa.UniqueConstraint("tenant_id", "student_id", name="uq_gamification_profiles_student"),
+    )
+    create_tenant_index("gamification_profiles")
+    op.create_index("ix_gamification_profiles_student_id", "gamification_profiles", ["student_id"])
+
+    op.create_table(
+        "badges",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column("code", sa.String(length=80), nullable=False),
+        sa.Column("name", sa.String(length=120), nullable=False),
+        sa.Column("description", sa.String(length=1000), nullable=True),
+        sa.Column("icon", sa.String(length=120), nullable=True),
+        sa.Column("xp_threshold", sa.Integer(), nullable=False, server_default="0"),
+        jsonb_column("metadata"),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_badges"),
+        sa.UniqueConstraint("tenant_id", "code", name="uq_badges_code"),
+    )
+    create_tenant_index("badges")
+
+    op.create_table(
+        "student_badges",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column(
+            "student_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("students.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "badge_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("badges.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        jsonb_column("evidence"),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_student_badges"),
+        sa.UniqueConstraint("tenant_id", "student_id", "badge_id", name="uq_student_badges"),
+    )
+    create_tenant_index("student_badges")
+    op.create_index("ix_student_badges_student_id", "student_badges", ["student_id"])
+    op.create_index("ix_student_badges_badge_id", "student_badges", ["badge_id"])
+
+    op.create_table(
+        "challenges",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column("code", sa.String(length=80), nullable=False),
+        sa.Column("name", sa.String(length=120), nullable=False),
+        sa.Column("description", sa.String(length=1000), nullable=True),
+        sa.Column("xp_reward", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("goal_count", sa.Integer(), nullable=False, server_default="1"),
+        sa.Column("active", sa.Boolean(), nullable=False, server_default="true"),
+        jsonb_column("metadata"),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_challenges"),
+        sa.UniqueConstraint("tenant_id", "code", name="uq_challenges_code"),
+    )
+    create_tenant_index("challenges")
+
+    op.create_table(
+        "student_challenges",
+        uuid_pk(),
+        tenant_fk(),
+        sa.Column(
+            "student_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("students.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "challenge_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("challenges.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column("status", challenge_status, nullable=False, server_default="pending"),
+        sa.Column("progress_count", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+        jsonb_column("metadata"),
+        *timestamps(),
+        sa.PrimaryKeyConstraint("id", name="pk_student_challenges"),
+        sa.UniqueConstraint("tenant_id", "student_id", "challenge_id", name="uq_student_challenges"),
+    )
+    create_tenant_index("student_challenges")
+    op.create_index("ix_student_challenges_student_id", "student_challenges", ["student_id"])
+    op.create_index("ix_student_challenges_challenge_id", "student_challenges", ["challenge_id"])
 
     op.create_table(
         "sync_operations",

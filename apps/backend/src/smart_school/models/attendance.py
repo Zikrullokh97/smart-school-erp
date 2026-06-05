@@ -15,6 +15,7 @@ from smart_school.models.enums import (
     AttendanceEventType,
     AttendanceSessionStatus,
     AttendanceSource,
+    AttendanceMethod,
     BiometricStatus,
 )
 from smart_school.models.mixins import TenantScopedMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -88,6 +89,10 @@ class AttendanceEvent(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Ba
         enum_type(AttendanceSource, "attendance_source"),
         nullable=False,
     )
+    method: Mapped[AttendanceMethod] = mapped_column(
+        enum_type(AttendanceMethod, "attendance_method"),
+        nullable=False,
+    )
     captured_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -100,6 +105,8 @@ class AttendanceEvent(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Ba
         index=True,
     )
     idempotency_key: Mapped[str] = mapped_column(String(120), nullable=False)
+    fraud_score: Mapped[Decimal | None] = mapped_column(Numeric(5, 4), nullable=True)
+    fraud_flags: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     confidence_score: Mapped[Decimal | None] = mapped_column(Numeric(5, 4), nullable=True)
     evidence: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     notes: Mapped[str | None] = mapped_column(String(1000), nullable=True)

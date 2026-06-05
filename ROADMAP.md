@@ -12,11 +12,11 @@
 | --- | --- | --- | --- |
 | 1 | Repository initialization, monorepo setup, folder structure, README, architecture docs | Complete | `docs/progress/phase-01-repository-foundation.md` |
 | 2 | Database design, SQLAlchemy models, Alembic migrations, seed data | Complete | `docs/progress/phase-02-database-foundation.md` |
-| 3 | Authentication, JWT, RBAC, user management, school management | Next | Pending |
-| 4 | Student module | Not started | Pending |
-| 5 | Teacher module | Not started | Pending |
-| 6 | Parent module | Not started | Pending |
-| 7 | Attendance system | Not started | Pending |
+| 3 | Authentication, JWT, RBAC, user management, school management | Complete | `docs/progress/phase-03-authentication.md` |
+| 4 | Student module | Complete | `docs/progress/phase-04-students.md` |
+| 5 | Teacher module | Complete | `docs/progress/phase-05-teachers.md` |
+| 6 | Parent module | Complete | `docs/progress/phase-06-parents.md` |
+| 7 | Attendance system | Complete | `docs/progress/phase-07-attendance.md` |
 | 8 | Face ID infrastructure | Not started | Pending |
 | 9 | Notification system | Not started | Pending |
 | 10 | AI reporting engine | Not started | Pending |
@@ -33,4 +33,4 @@
 
 ## Current Milestone
 
-Phase 3 builds authentication, JWT session management, RBAC enforcement, user management APIs, and school management APIs.
+Phase 7 builds attendance capture, session tracking, and student presence reporting for classroom operations.

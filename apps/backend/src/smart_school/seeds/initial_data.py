@@ -19,7 +19,9 @@ class RoleSeed:
 
 INITIAL_PERMISSIONS: tuple[PermissionSeed, ...] = (
     PermissionSeed("tenants.manage", "Manage tenant lifecycle and platform configuration."),
+    PermissionSeed("schools.read", "Read school records and school-level settings."),
     PermissionSeed("schools.manage", "Manage school records and school-level settings."),
+    PermissionSeed("users.read", "Read users and account status."),
     PermissionSeed("users.manage", "Manage users, invitations, and account status."),
     PermissionSeed("roles.manage", "Manage roles and permission assignments."),
     PermissionSeed("students.read", "Read student records."),
@@ -54,7 +56,9 @@ INITIAL_ROLES: tuple[RoleSeed, ...] = (
         "School Administrator",
         "School-level administrator for operations and reporting.",
         (
+            "schools.read",
             "schools.manage",
+            "users.read",
             "users.manage",
             "roles.manage",
             "students.read",
@@ -81,6 +85,7 @@ INITIAL_ROLES: tuple[RoleSeed, ...] = (
         "Teacher",
         "Teacher role for class operations and attendance capture.",
         (
+            "schools.read",
             "students.read",
             "parents.read",
             "attendance.read",
@@ -94,6 +99,7 @@ INITIAL_ROLES: tuple[RoleSeed, ...] = (
         "Parent",
         "Parent and guardian role for student visibility and communication.",
         (
+            "schools.read",
             "students.read",
             "attendance.read",
             "notifications.read",
@@ -104,6 +110,7 @@ INITIAL_ROLES: tuple[RoleSeed, ...] = (
         "Attendance Operator",
         "Operational role for attendance collection and sync review.",
         (
+            "schools.read",
             "students.read",
             "attendance.read",
             "attendance.capture",

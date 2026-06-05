@@ -54,8 +54,24 @@ class AttendanceEventType(StrEnum):
 class AttendanceSource(StrEnum):
     MANUAL = "manual"
     FACE_ID = "face_id"
+    QR_CODE = "qr_code"
+    NFC = "nfc"
     IMPORT = "import"
     OFFLINE_SYNC = "offline_sync"
+
+
+class ChallengeStatus(StrEnum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class AttendanceMethod(StrEnum):
+    FACE_ID = "face_id"
+    QR_CODE = "qr_code"
+    NFC = "nfc"
+    MANUAL = "manual"
 
 
 class BiometricStatus(StrEnum):
@@ -84,6 +100,13 @@ class AIReportStatus(StrEnum):
     READY = "ready"
     REVIEWED = "reviewed"
     FAILED = "failed"
+
+
+class AIReviewDecision(StrEnum):
+    APPROVE = "approve"
+    REJECT = "reject"
+    ESCALATE = "escalate"
+    DEFER = "defer"
 
 
 class SyncOperationStatus(StrEnum):

@@ -85,6 +85,7 @@ class ParentProfile(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base
     phone_number: Mapped[str] = mapped_column(String(40), nullable=False)
     preferred_language: Mapped[str] = mapped_column(String(16), nullable=False, default="ky-KG")
     profile: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    ui_preferences: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
 
 
 class ParentStudentLink(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base):
