@@ -101,14 +101,18 @@ def test_list_parent_profiles_returns_profiles(
 
 @patch("smart_school.api.routers.parents.auth_crud.get_user_by_id", new_callable=AsyncMock)
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
-@patch("smart_school.api.routers.parents.parents_crud.create_parent_profile", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.parents.parents_crud.create_parent_profile", new_callable=AsyncMock
+)
 def test_create_parent_profile_validates_payload(
     mock_create_parent_profile: AsyncMock,
     mock_get_user_permissions: AsyncMock,
     mock_get_user_by_id: AsyncMock,
 ) -> None:
     mock_get_user_permissions.return_value = {"parents.manage", "parents.read"}
-    mock_get_user_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000001"))
+    mock_get_user_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000001")
+    )
     mock_create_parent_profile.return_value = SimpleNamespace(
         id=uuid.UUID("00000000-0000-0000-0000-000000000020"),
         user_id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
@@ -140,7 +144,10 @@ def test_create_parent_profile_validates_payload(
 
 
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
-@patch("smart_school.api.routers.parents.parents_crud.list_parent_student_links", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.parents.parents_crud.list_parent_student_links",
+    new_callable=AsyncMock,
+)
 def test_list_parent_student_links_returns_links(
     mock_list_parent_student_links: AsyncMock,
     mock_get_user_permissions: AsyncMock,
@@ -180,7 +187,10 @@ def test_list_parent_student_links_returns_links(
 
 
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
-@patch("smart_school.api.routers.parents.parents_crud.create_parent_student_link", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.parents.parents_crud.create_parent_student_link",
+    new_callable=AsyncMock,
+)
 def test_create_parent_student_link_validates_payload(
     mock_create_parent_student_link: AsyncMock,
     mock_get_user_permissions: AsyncMock,

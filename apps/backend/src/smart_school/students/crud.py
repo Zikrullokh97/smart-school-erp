@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,10 +10,10 @@ from smart_school.models.people import Student
 from smart_school.models.school import School
 
 
-async def get_school_by_id(session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID) -> School | None:
-    result = await session.execute(
-        select(School).filter_by(tenant_id=tenant_id, id=school_id)
-    )
+async def get_school_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID
+) -> School | None:
+    result = await session.execute(select(School).filter_by(tenant_id=tenant_id, id=school_id))
     return result.scalar_one_or_none()
 
 
@@ -21,10 +22,10 @@ async def list_students(session: AsyncSession, tenant_id: uuid.UUID) -> list[Stu
     return result.scalars().all()
 
 
-async def get_student_by_id(session: AsyncSession, tenant_id: uuid.UUID, student_id: uuid.UUID) -> Student | None:
-    result = await session.execute(
-        select(Student).filter_by(tenant_id=tenant_id, id=student_id)
-    )
+async def get_student_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, student_id: uuid.UUID
+) -> Student | None:
+    result = await session.execute(select(Student).filter_by(tenant_id=tenant_id, id=student_id))
     return result.scalar_one_or_none()
 
 

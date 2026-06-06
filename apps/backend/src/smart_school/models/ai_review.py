@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import uuid
-from sqlalchemy import ForeignKey, String, Uuid, UniqueConstraint
+
+from sqlalchemy import ForeignKey, String, UniqueConstraint, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -14,7 +15,9 @@ from smart_school.models.mixins import TenantScopedMixin, TimestampMixin, UUIDPr
 class AIReviewAction(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base):
     __tablename__ = "ai_review_actions"
     __table_args__ = (
-        UniqueConstraint("tenant_id", "ai_report_id", "actor_user_id", "created_at", name="uq_ai_review_actions"),
+        UniqueConstraint(
+            "tenant_id", "ai_report_id", "actor_user_id", "created_at", name="uq_ai_review_actions"
+        ),
     )
 
     ai_report_id: Mapped[uuid.UUID] = mapped_column(

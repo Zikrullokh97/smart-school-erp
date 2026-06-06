@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from types import SimpleNamespace
+
 from fastapi.testclient import TestClient
 
 from smart_school.app import create_app

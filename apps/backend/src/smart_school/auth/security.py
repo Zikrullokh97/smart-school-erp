@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
@@ -45,7 +45,7 @@ def _load_jwt_keys() -> tuple[str, str, str]:
 def create_access_token(user_id: str, tenant_id: str) -> tuple[str, int]:
     algorithm, private_key, _public_key = _load_jwt_keys()
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     expires_at = now + timedelta(minutes=settings.jwt_access_token_minutes)
     payload: dict[str, Any] = {
         "sub": user_id,

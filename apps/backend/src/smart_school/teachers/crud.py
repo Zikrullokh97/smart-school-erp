@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,14 +12,16 @@ from smart_school.models.people import Teacher
 from smart_school.models.school import School
 
 
-async def get_school_by_id(session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID) -> School | None:
-    result = await session.execute(
-        select(School).filter_by(tenant_id=tenant_id, id=school_id)
-    )
+async def get_school_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID
+) -> School | None:
+    result = await session.execute(select(School).filter_by(tenant_id=tenant_id, id=school_id))
     return result.scalar_one_or_none()
 
 
-async def get_user_by_id(session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID) -> User | None:
+async def get_user_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID
+) -> User | None:
     return await auth_crud.get_user_by_id(session, tenant_id, user_id)
 
 
@@ -27,10 +30,10 @@ async def list_teachers(session: AsyncSession, tenant_id: uuid.UUID) -> list[Tea
     return result.scalars().all()
 
 
-async def get_teacher_by_id(session: AsyncSession, tenant_id: uuid.UUID, teacher_id: uuid.UUID) -> Teacher | None:
-    result = await session.execute(
-        select(Teacher).filter_by(tenant_id=tenant_id, id=teacher_id)
-    )
+async def get_teacher_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, teacher_id: uuid.UUID
+) -> Teacher | None:
+    result = await session.execute(select(Teacher).filter_by(tenant_id=tenant_id, id=teacher_id))
     return result.scalar_one_or_none()
 
 

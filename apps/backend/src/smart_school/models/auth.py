@@ -25,7 +25,9 @@ class AuthSession(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base):
     refresh_token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(80), nullable=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     rotated_from_session_id: Mapped[uuid.UUID | None] = mapped_column(

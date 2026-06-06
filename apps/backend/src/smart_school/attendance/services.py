@@ -8,8 +8,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from smart_school.attendance import crud as attendance_crud
-from smart_school.models.attendance import AttendanceMethod, AttendanceSource, FaceEmbedding
-from smart_school.models.people import Student
+from smart_school.models.attendance import (
+    AttendanceEvent,
+    AttendanceMethod,
+    AttendanceSource,
+    FaceEmbedding,
+)
 
 
 @dataclass(frozen=True)
@@ -166,7 +170,9 @@ async def capture_attendance_event(
         captured_at,
         captured_by_user_id,
         idempotency_key,
-        fraud_score=float(capture_result.fraud_score) if capture_result.fraud_score is not None else None,
+        fraud_score=float(capture_result.fraud_score)
+        if capture_result.fraud_score is not None
+        else None,
         fraud_flags=capture_result.fraud_flags,
         confidence_score=confidence_score,
         evidence={**capture_result.evidence, **({} if notes is None else {"notes": notes})},

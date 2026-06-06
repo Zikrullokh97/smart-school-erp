@@ -11,21 +11,24 @@ from smart_school.auth.dependencies import (
     get_session,
     require_permission,
 )
+from smart_school.models.identity import User
+from smart_school.models.tenant import Tenant
 from smart_school.students import crud as students_crud
 from smart_school.students.schemas import (
     StudentCreateRequest,
     StudentRead,
     StudentUpdateRequest,
 )
-from smart_school.models.tenant import Tenant
 
 router = APIRouter(prefix="/students", tags=["Students"])
+students_read_permission = require_permission("students.read")
+students_manage_permission = require_permission("students.manage")
 
 
 @router.get("/", response_model=list[StudentRead])
 async def list_students(
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("students.read")),
+    _user: Annotated[User, Depends(students_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[StudentRead]:
     students = await students_crud.list_students(session, tenant.id)
@@ -36,7 +39,7 @@ async def list_students(
 async def read_student(
     student_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("students.read")),
+    _user: Annotated[User, Depends(students_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> StudentRead:
     student = await students_crud.get_student_by_id(session, tenant.id, student_id)
@@ -49,7 +52,7 @@ async def read_student(
 async def create_student(
     payload: StudentCreateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("students.manage")),
+    _user: Annotated[User, Depends(students_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> StudentRead:
     school = await students_crud.get_school_by_id(session, tenant.id, payload.school_id)
@@ -79,7 +82,7 @@ async def update_student(
     student_id: uuid.UUID,
     payload: StudentUpdateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("students.manage")),
+    _user: Annotated[User, Depends(students_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> StudentRead:
     student = await students_crud.update_student(

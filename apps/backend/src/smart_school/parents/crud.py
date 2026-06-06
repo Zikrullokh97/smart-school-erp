@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_school.auth import crud as auth_crud
 from smart_school.models.people import ParentProfile, ParentStudentLink, Student
-from smart_school.models.identity import User
 
 
 async def get_parent_profile_by_id(
@@ -82,7 +81,9 @@ async def list_parent_student_links(
     parent_profile_id: uuid.UUID,
 ) -> list[ParentStudentLink]:
     result = await session.execute(
-        select(ParentStudentLink).filter_by(tenant_id=tenant_id, parent_profile_id=parent_profile_id)
+        select(ParentStudentLink).filter_by(
+            tenant_id=tenant_id, parent_profile_id=parent_profile_id
+        )
     )
     return result.scalars().all()
 

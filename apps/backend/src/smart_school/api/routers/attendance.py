@@ -7,12 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_school.auth.dependencies import (
-    get_current_tenant,
-    get_current_user,
-    get_session,
-    require_permission,
-)
 from smart_school.attendance import crud as attendance_crud
 from smart_school.attendance import services as attendance_services
 from smart_school.attendance.schemas import (
@@ -23,16 +17,25 @@ from smart_school.attendance.schemas import (
     AttendanceSessionRead,
     AttendanceSessionUpdateRequest,
 )
+from smart_school.auth.dependencies import (
+    get_current_tenant,
+    get_session,
+    require_permission,
+)
 from smart_school.models.audit import AuditLog
+from smart_school.models.identity import User
 from smart_school.models.tenant import Tenant
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
+attendance_read_permission = require_permission("attendance.read")
+attendance_manage_permission = require_permission("attendance.manage")
+attendance_capture_permission = require_permission("attendance.capture")
 
 
 @router.get("/sessions", response_model=list[AttendanceSessionRead])
 async def list_attendance_sessions(
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.read")),
+    _user: Annotated[User, Depends(attendance_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[AttendanceSessionRead]:
     sessions = await attendance_crud.list_sessions(session, tenant.id)
@@ -43,12 +46,14 @@ async def list_attendance_sessions(
 async def read_attendance_session(
     session_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.read")),
+    _user: Annotated[User, Depends(attendance_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceSessionRead:
     attendance_session = await attendance_crud.get_session_by_id(session, tenant.id, session_id)
     if attendance_session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found."
+        )
     return AttendanceSessionRead.model_validate(attendance_session)
 
 
@@ -56,14 +61,16 @@ async def read_attendance_session(
 async def create_attendance_session(
     payload: AttendanceSessionCreateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.manage")),
+    _user: Annotated[User, Depends(attendance_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceSessionRead:
     school = await attendance_crud.get_school_by_id(session, tenant.id, payload.school_id)
     if school is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="School not found.")
 
-    class_group = await attendance_crud.get_class_group_by_id(session, tenant.id, payload.class_group_id)
+    class_group = await attendance_crud.get_class_group_by_id(
+        session, tenant.id, payload.class_group_id
+    )
     if class_group is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Class group not found.")
 
@@ -88,7 +95,7 @@ async def update_attendance_session(
     session_id: uuid.UUID,
     payload: AttendanceSessionUpdateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.manage")),
+    _user: Annotated[User, Depends(attendance_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceSessionRead:
     attendance_session = await attendance_crud.update_session(
@@ -103,7 +110,9 @@ async def update_attendance_session(
         status=payload.status,
     )
     if attendance_session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found."
+        )
     await session.commit()
     return AttendanceSessionRead.model_validate(attendance_session)
 
@@ -112,7 +121,7 @@ async def update_attendance_session(
 async def list_attendance_events(
     session_id: Annotated[uuid.UUID | None, Query(alias="session_id")] = None,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.read")),
+    _user: Annotated[User, Depends(attendance_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[AttendanceEventRead]:
     events = await attendance_crud.list_events(session, tenant.id, session_id)
@@ -123,12 +132,14 @@ async def list_attendance_events(
 async def read_attendance_event(
     event_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.read")),
+    _user: Annotated[User, Depends(attendance_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceEventRead:
     event = await attendance_crud.get_event_by_id(session, tenant.id, event_id)
     if event is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance event not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Attendance event not found."
+        )
     return AttendanceEventRead.model_validate(event)
 
 
@@ -136,12 +147,16 @@ async def read_attendance_event(
 async def capture_attendance(
     payload: AttendanceCaptureRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    user=Depends(require_permission("attendance.capture")),
+    user: Annotated[User, Depends(attendance_capture_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceEventRead:
-    attendance_session = await attendance_crud.get_session_by_id(session, tenant.id, payload.session_id)
+    attendance_session = await attendance_crud.get_session_by_id(
+        session, tenant.id, payload.session_id
+    )
     if attendance_session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found."
+        )
 
     student = await attendance_crud.get_student_by_id(session, tenant.id, payload.student_id)
     if student is None:
@@ -193,12 +208,16 @@ async def capture_attendance(
 async def create_attendance_event(
     payload: AttendanceEventCreateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("attendance.capture")),
+    _user: Annotated[User, Depends(attendance_capture_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> AttendanceEventRead:
-    attendance_session = await attendance_crud.get_session_by_id(session, tenant.id, payload.session_id)
+    attendance_session = await attendance_crud.get_session_by_id(
+        session, tenant.id, payload.session_id
+    )
     if attendance_session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Attendance session not found."
+        )
 
     student = await attendance_crud.get_student_by_id(session, tenant.id, payload.student_id)
     if student is None:

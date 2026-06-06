@@ -6,12 +6,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from smart_school.auth import crud as auth_crud
 from smart_school.auth.dependencies import (
     get_current_tenant,
     get_session,
     require_permission,
 )
-from smart_school.auth import crud as auth_crud
+from smart_school.models.identity import User
 from smart_school.models.tenant import Tenant
 from smart_school.teachers import crud as teachers_crud
 from smart_school.teachers.schemas import (
@@ -21,12 +22,14 @@ from smart_school.teachers.schemas import (
 )
 
 router = APIRouter(prefix="/teachers", tags=["Teachers"])
+teachers_read_permission = require_permission("teachers.read")
+teachers_manage_permission = require_permission("teachers.manage")
 
 
 @router.get("/", response_model=list[TeacherRead])
 async def list_teachers(
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("teachers.read")),
+    _user: Annotated[User, Depends(teachers_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[TeacherRead]:
     teachers = await teachers_crud.list_teachers(session, tenant.id)
@@ -37,7 +40,7 @@ async def list_teachers(
 async def read_teacher(
     teacher_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("teachers.read")),
+    _user: Annotated[User, Depends(teachers_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> TeacherRead:
     teacher = await teachers_crud.get_teacher_by_id(session, tenant.id, teacher_id)
@@ -50,7 +53,7 @@ async def read_teacher(
 async def create_teacher(
     payload: TeacherCreateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("teachers.manage")),
+    _user: Annotated[User, Depends(teachers_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> TeacherRead:
     school = await teachers_crud.get_school_by_id(session, tenant.id, payload.school_id)
@@ -83,7 +86,7 @@ async def update_teacher(
     teacher_id: uuid.UUID,
     payload: TeacherUpdateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("teachers.manage")),
+    _user: Annotated[User, Depends(teachers_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> TeacherRead:
     if payload.user_id is not None:

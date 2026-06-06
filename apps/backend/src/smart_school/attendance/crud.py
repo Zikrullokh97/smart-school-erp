@@ -7,22 +7,30 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_school.models.attendance import AttendanceEvent, AttendanceMethod, AttendanceSession
+from smart_school.models.attendance import AttendanceEvent, AttendanceSession
 from smart_school.models.people import Student
 from smart_school.models.school import ClassGroup, School
 
 
-async def get_school_by_id(session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID) -> School | None:
+async def get_school_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, school_id: uuid.UUID
+) -> School | None:
     result = await session.execute(select(School).filter_by(tenant_id=tenant_id, id=school_id))
     return result.scalar_one_or_none()
 
 
-async def get_class_group_by_id(session: AsyncSession, tenant_id: uuid.UUID, class_group_id: uuid.UUID) -> ClassGroup | None:
-    result = await session.execute(select(ClassGroup).filter_by(tenant_id=tenant_id, id=class_group_id))
+async def get_class_group_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, class_group_id: uuid.UUID
+) -> ClassGroup | None:
+    result = await session.execute(
+        select(ClassGroup).filter_by(tenant_id=tenant_id, id=class_group_id)
+    )
     return result.scalar_one_or_none()
 
 
-async def get_session_by_id(session: AsyncSession, tenant_id: uuid.UUID, session_id: uuid.UUID) -> AttendanceSession | None:
+async def get_session_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, session_id: uuid.UUID
+) -> AttendanceSession | None:
     result = await session.execute(
         select(AttendanceSession).filter_by(tenant_id=tenant_id, id=session_id)
     )
@@ -94,12 +102,16 @@ async def update_session(
     return attendance_session
 
 
-async def get_student_by_id(session: AsyncSession, tenant_id: uuid.UUID, student_id: uuid.UUID) -> Student | None:
+async def get_student_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, student_id: uuid.UUID
+) -> Student | None:
     result = await session.execute(select(Student).filter_by(tenant_id=tenant_id, id=student_id))
     return result.scalar_one_or_none()
 
 
-async def list_events(session: AsyncSession, tenant_id: uuid.UUID, session_id: uuid.UUID | None = None) -> list[AttendanceEvent]:
+async def list_events(
+    session: AsyncSession, tenant_id: uuid.UUID, session_id: uuid.UUID | None = None
+) -> list[AttendanceEvent]:
     query = select(AttendanceEvent).filter_by(tenant_id=tenant_id)
     if session_id is not None:
         query = query.filter_by(session_id=session_id)
@@ -107,7 +119,9 @@ async def list_events(session: AsyncSession, tenant_id: uuid.UUID, session_id: u
     return result.scalars().all()
 
 
-async def get_event_by_id(session: AsyncSession, tenant_id: uuid.UUID, event_id: uuid.UUID) -> AttendanceEvent | None:
+async def get_event_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, event_id: uuid.UUID
+) -> AttendanceEvent | None:
     result = await session.execute(
         select(AttendanceEvent).filter_by(tenant_id=tenant_id, id=event_id)
     )

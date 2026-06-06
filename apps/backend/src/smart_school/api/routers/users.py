@@ -1,32 +1,31 @@
 from __future__ import annotations
 
 import uuid
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from smart_school.auth import crud as auth_crud
 from smart_school.auth.dependencies import (
     get_current_tenant,
-    get_current_user,
     get_session,
     require_permission,
 )
 from smart_school.auth.schemas import UserCreateRequest, UserRead, UserUpdateRequest
-from smart_school.auth.security import hash_password
-from smart_school.auth import crud as auth_crud
 from smart_school.models.identity import User
 from smart_school.models.tenant import Tenant
 
 router = APIRouter(prefix="/users", tags=["Users"])
+users_read_permission = require_permission("users.read")
+users_manage_permission = require_permission("users.manage")
 
 
 @router.get("/", response_model=list[UserRead])
 async def list_users(
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("users.read")),
+    _user: Annotated[User, Depends(users_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[UserRead]:
     result = await session.execute(select(User).filter_by(tenant_id=tenant.id))
@@ -51,7 +50,7 @@ async def list_users(
 async def create_user(
     payload: UserCreateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("users.manage")),
+    _user: Annotated[User, Depends(users_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> UserRead:
     user = await auth_crud.create_user(
@@ -84,7 +83,7 @@ async def update_user(
     user_id: uuid.UUID,
     payload: UserUpdateRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("users.manage")),
+    _user: Annotated[User, Depends(users_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> UserRead:
     user = await auth_crud.get_user_by_id(session, tenant.id, user_id)

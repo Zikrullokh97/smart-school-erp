@@ -25,7 +25,9 @@ async def ensure_tenant_roles(session: AsyncSession, tenant_id: str) -> None:
     }
     existing_roles = {
         role.code
-        for role in (await session.execute(select(Role).filter_by(tenant_id=tenant_id))).scalars().all()
+        for role in (await session.execute(select(Role).filter_by(tenant_id=tenant_id)))
+        .scalars()
+        .all()
     }
     for role_seed in INITIAL_ROLES:
         if role_seed.code in existing_roles:

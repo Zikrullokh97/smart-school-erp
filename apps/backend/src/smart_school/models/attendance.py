@@ -13,9 +13,9 @@ from smart_school.db.base import Base
 from smart_school.models.common import enum_type
 from smart_school.models.enums import (
     AttendanceEventType,
+    AttendanceMethod,
     AttendanceSessionStatus,
     AttendanceSource,
-    AttendanceMethod,
     BiometricStatus,
 )
 from smart_school.models.mixins import TenantScopedMixin, TimestampMixin, UUIDPrimaryKeyMixin

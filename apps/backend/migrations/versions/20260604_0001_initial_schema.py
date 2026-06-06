@@ -27,9 +27,7 @@ person_status = postgresql.ENUM(
 teacher_status = postgresql.ENUM(
     "active", "inactive", "graduated", "transferred", "archived", name="teacher_status"
 )
-enrollment_status = postgresql.ENUM(
-    "active", "withdrawn", "completed", name="enrollment_status"
-)
+enrollment_status = postgresql.ENUM("active", "withdrawn", "completed", name="enrollment_status")
 attendance_session_status = postgresql.ENUM(
     "open", "submitted", "approved", "locked", name="attendance_session_status"
 )
@@ -58,6 +56,9 @@ ai_report_status = postgresql.ENUM(
 sync_operation_status = postgresql.ENUM(
     "received", "applied", "conflicted", "rejected", name="sync_operation_status"
 )
+challenge_status = postgresql.ENUM(
+    "pending", "in_progress", "completed", "failed", name="challenge_status"
+)
 outbox_status = postgresql.ENUM(
     "pending", "processing", "published", "failed", name="outbox_status"
 )
@@ -77,6 +78,7 @@ enum_types = (
     notification_status,
     ai_report_status,
     sync_operation_status,
+    challenge_status,
     outbox_status,
 )
 
@@ -810,7 +812,9 @@ def upgrade() -> None:
         jsonb_column("metadata"),
         *timestamps(),
         sa.PrimaryKeyConstraint("id", name="pk_ai_review_actions"),
-        sa.UniqueConstraint("tenant_id", "ai_report_id", "actor_user_id", "created_at", name="uq_ai_review_actions"),
+        sa.UniqueConstraint(
+            "tenant_id", "ai_report_id", "actor_user_id", "created_at", name="uq_ai_review_actions"
+        ),
     )
     create_tenant_index("ai_review_actions")
     op.create_index("ix_ai_review_actions_ai_report_id", "ai_review_actions", ["ai_report_id"])
@@ -938,7 +942,9 @@ def upgrade() -> None:
         jsonb_column("metadata"),
         *timestamps(),
         sa.PrimaryKeyConstraint("id", name="pk_student_challenges"),
-        sa.UniqueConstraint("tenant_id", "student_id", "challenge_id", name="uq_student_challenges"),
+        sa.UniqueConstraint(
+            "tenant_id", "student_id", "challenge_id", name="uq_student_challenges"
+        ),
     )
     create_tenant_index("student_challenges")
     op.create_index("ix_student_challenges_student_id", "student_challenges", ["student_id"])

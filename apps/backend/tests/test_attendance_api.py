@@ -40,7 +40,7 @@ def dummy_session() -> SimpleNamespace:
             pass
 
         def add(self, obj: object) -> None:
-            setattr(self, "last_added", obj)
+            self.last_added = obj
 
     return DummySession()
 
@@ -109,8 +109,13 @@ def test_list_attendance_sessions_returns_sessions(
 
 
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_crud.get_school_by_id", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_crud.get_class_group_by_id", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_school_by_id", new_callable=AsyncMock
+)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_class_group_by_id",
+    new_callable=AsyncMock,
+)
 @patch("smart_school.api.routers.attendance.attendance_crud.create_session", new_callable=AsyncMock)
 def test_create_attendance_session_validates_payload(
     mock_create_session: AsyncMock,
@@ -156,8 +161,12 @@ def test_create_attendance_session_validates_payload(
 
 
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_crud.get_session_by_id", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_crud.get_student_by_id", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_session_by_id", new_callable=AsyncMock
+)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_student_by_id", new_callable=AsyncMock
+)
 @patch("smart_school.api.routers.attendance.attendance_crud.create_event", new_callable=AsyncMock)
 def test_create_attendance_event_validates_payload(
     mock_create_event: AsyncMock,
@@ -166,8 +175,12 @@ def test_create_attendance_event_validates_payload(
     mock_get_user_permissions: AsyncMock,
 ) -> None:
     mock_get_user_permissions.return_value = {"attendance.capture", "attendance.read"}
-    mock_get_session_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000050"))
-    mock_get_student_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000060"))
+    mock_get_session_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000050")
+    )
+    mock_get_student_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000060")
+    )
     mock_create_event.return_value = SimpleNamespace(
         id=uuid.UUID("00000000-0000-0000-0000-000000000070"),
         session_id=mock_get_session_by_id.return_value.id,
@@ -210,9 +223,16 @@ def test_create_attendance_event_validates_payload(
     assert response.json()["idempotency_key"] == "attendance-123"
 
 
-@patch("smart_school.api.routers.attendance.attendance_crud.get_session_by_id", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_crud.get_student_by_id", new_callable=AsyncMock)
-@patch("smart_school.api.routers.attendance.attendance_services.capture_attendance_event", new_callable=AsyncMock)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_session_by_id", new_callable=AsyncMock
+)
+@patch(
+    "smart_school.api.routers.attendance.attendance_crud.get_student_by_id", new_callable=AsyncMock
+)
+@patch(
+    "smart_school.api.routers.attendance.attendance_services.capture_attendance_event",
+    new_callable=AsyncMock,
+)
 @patch("smart_school.auth.dependencies.get_user_permissions", new_callable=AsyncMock)
 def test_capture_attendance_event_falls_back_and_returns_event(
     mock_get_user_permissions: AsyncMock,
@@ -221,8 +241,12 @@ def test_capture_attendance_event_falls_back_and_returns_event(
     mock_get_session_by_id: AsyncMock,
 ) -> None:
     mock_get_user_permissions.return_value = {"attendance.capture", "attendance.read"}
-    mock_get_session_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000050"))
-    mock_get_student_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000060"))
+    mock_get_session_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000050")
+    )
+    mock_get_student_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000060")
+    )
     mock_capture_event.return_value = (
         SimpleNamespace(
             id=uuid.UUID("00000000-0000-0000-0000-000000000080"),

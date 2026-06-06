@@ -26,9 +26,7 @@ role_permissions_table = Table(
     "role_permissions",
     Base.metadata,
     Column("role_id", Uuid(as_uuid=True), ForeignKey("roles.id", ondelete="CASCADE")),
-    Column(
-        "permission_id", Uuid(as_uuid=True), ForeignKey("permissions.id", ondelete="CASCADE")
-    ),
+    Column("permission_id", Uuid(as_uuid=True), ForeignKey("permissions.id", ondelete="CASCADE")),
     Column("created_at", DateTime(timezone=True), nullable=False, server_default=func.now()),
     UniqueConstraint("role_id", "permission_id", name="uq_role_permissions_role_permission"),
 )

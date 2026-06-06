@@ -7,8 +7,8 @@ Create Date: 2026-06-04 01:00:00
 
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision = "20260604_0002"
@@ -45,10 +45,16 @@ def upgrade() -> None:
             sa.ForeignKey("auth_sessions.id", ondelete="SET NULL"),
             nullable=True,
         ),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id", name="pk_auth_sessions"),
-        sa.UniqueConstraint("tenant_id", "refresh_token_hash", name="uq_auth_sessions_refresh_hash"),
+        sa.UniqueConstraint(
+            "tenant_id", "refresh_token_hash", name="uq_auth_sessions_refresh_hash"
+        ),
     )
     op.create_index("ix_auth_sessions_tenant_id", "auth_sessions", ["tenant_id"])
     op.create_index("ix_auth_sessions_user_id", "auth_sessions", ["user_id"])

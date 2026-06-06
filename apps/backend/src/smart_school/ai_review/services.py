@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from smart_school.ai_review import crud as ai_review_crud

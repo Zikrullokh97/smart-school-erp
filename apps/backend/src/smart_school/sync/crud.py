@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import uuid
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_school.models.sync import SyncDevice, SyncOperation
 from smart_school.models.enums import SyncOperationStatus
+from smart_school.models.sync import SyncDevice, SyncOperation
 
 
 async def create_sync_device(
@@ -28,7 +29,9 @@ async def create_sync_device(
     return device
 
 
-async def get_sync_device_by_id(session: AsyncSession, tenant_id: uuid.UUID, device_id: uuid.UUID) -> SyncDevice | None:
+async def get_sync_device_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, device_id: uuid.UUID
+) -> SyncDevice | None:
     result = await session.execute(select(SyncDevice).filter_by(tenant_id=tenant_id, id=device_id))
     return result.scalar_one_or_none()
 
@@ -73,8 +76,12 @@ async def list_sync_operations(session: AsyncSession, tenant_id: uuid.UUID) -> l
     return result.scalars().all()
 
 
-async def get_sync_operation_by_id(session: AsyncSession, tenant_id: uuid.UUID, operation_id: uuid.UUID) -> SyncOperation | None:
-    result = await session.execute(select(SyncOperation).filter_by(tenant_id=tenant_id, id=operation_id))
+async def get_sync_operation_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, operation_id: uuid.UUID
+) -> SyncOperation | None:
+    result = await session.execute(
+        select(SyncOperation).filter_by(tenant_id=tenant_id, id=operation_id)
+    )
     return result.scalar_one_or_none()
 
 

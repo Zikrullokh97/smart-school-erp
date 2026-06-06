@@ -27,22 +27,26 @@ class GamificationProfile(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin
     )
     xp_total: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     level: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")
-    streak_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    streak_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     streak_start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
-    last_activity_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_activity_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class Badge(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base):
     __tablename__ = "badges"
-    __table_args__ = (
-        UniqueConstraint("tenant_id", "code", name="uq_badges_code"),
-    )
+    __table_args__ = (UniqueConstraint("tenant_id", "code", name="uq_badges_code"),)
 
     code: Mapped[str] = mapped_column(String(80), nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     icon: Mapped[str | None] = mapped_column(String(120), nullable=True)
-    xp_threshold: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    xp_threshold: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     metadata_: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
 
 
@@ -69,9 +73,7 @@ class StudentBadge(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base)
 
 class Challenge(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, Base):
     __tablename__ = "challenges"
-    __table_args__ = (
-        UniqueConstraint("tenant_id", "code", name="uq_challenges_code"),
-    )
+    __table_args__ = (UniqueConstraint("tenant_id", "code", name="uq_challenges_code"),)
 
     code: Mapped[str] = mapped_column(String(80), nullable=False)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
@@ -106,6 +108,8 @@ class StudentChallenge(UUIDPrimaryKeyMixin, TenantScopedMixin, TimestampMixin, B
         default=ChallengeStatus.PENDING,
         server_default=ChallengeStatus.PENDING.value,
     )
-    progress_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    progress_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     metadata_: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)

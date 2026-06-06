@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from typing import Iterable
 import uuid
+from collections.abc import Iterable
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,10 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from smart_school.auth.security import hash_password, hash_refresh_token
 from smart_school.core.config import get_settings
 from smart_school.models.auth import AuthSession
-from smart_school.models.identity import Permission, Role, User, role_permissions_table, user_roles_table
+from smart_school.models.enums import UserStatus
+from smart_school.models.identity import (
+    Permission,
+    Role,
+    User,
+    role_permissions_table,
+    user_roles_table,
+)
 from smart_school.models.school import School
 from smart_school.models.tenant import Tenant
-from smart_school.models.enums import UserStatus
 from smart_school.seeds.initial_data import INITIAL_PERMISSIONS, INITIAL_ROLES
 
 
@@ -73,7 +79,9 @@ async def ensure_tenant_roles(session: AsyncSession, tenant_id: uuid.UUID) -> No
     }
     existing_roles = {
         role.code
-        for role in (await session.execute(select(Role).filter_by(tenant_id=tenant_id))).scalars().all()
+        for role in (await session.execute(select(Role).filter_by(tenant_id=tenant_id)))
+        .scalars()
+        .all()
     }
     for role_seed in INITIAL_ROLES:
         if role_seed.code in existing_roles:
@@ -139,16 +147,14 @@ async def create_tenant_with_admin(
 
 
 async def get_user_by_email(session: AsyncSession, tenant_id: uuid.UUID, email: str) -> User | None:
-    result = await session.execute(
-        select(User).filter_by(tenant_id=tenant_id, email=email.lower())
-    )
+    result = await session.execute(select(User).filter_by(tenant_id=tenant_id, email=email.lower()))
     return result.scalar_one_or_none()
 
 
-async def get_user_by_id(session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID) -> User | None:
-    result = await session.execute(
-        select(User).filter_by(tenant_id=tenant_id, id=user_id)
-    )
+async def get_user_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID
+) -> User | None:
+    result = await session.execute(select(User).filter_by(tenant_id=tenant_id, id=user_id))
     return result.scalar_one_or_none()
 
 
@@ -190,8 +196,14 @@ async def assign_roles_to_user(
     role_codes: Iterable[str],
 ) -> None:
     roles = (
-        await session.execute(select(Role).filter_by(tenant_id=tenant_id).filter(Role.code.in_(role_codes)))
-    ).scalars().all()
+        (
+            await session.execute(
+                select(Role).filter_by(tenant_id=tenant_id).filter(Role.code.in_(role_codes))
+            )
+        )
+        .scalars()
+        .all()
+    )
     if len(roles) != len(set(role_codes)):
         missing = set(role_codes) - {role.code for role in roles}
         raise ValueError(f"Missing role codes for tenant: {sorted(missing)}")
@@ -216,7 +228,7 @@ async def create_auth_session(
     ip_address: str | None,
 ) -> AuthSession:
     settings = get_settings()
-    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.jwt_refresh_token_days)
+    expires_at = datetime.now(UTC) + timedelta(days=settings.jwt_refresh_token_days)
     auth_session = AuthSession(
         tenant_id=tenant_id,
         user_id=user_id,
@@ -242,12 +254,14 @@ async def get_auth_session_by_hash(
 
 
 async def revoke_auth_session(session: AsyncSession, auth_session: AuthSession) -> None:
-    auth_session.revoked_at = datetime.now(timezone.utc)
+    auth_session.revoked_at = datetime.now(UTC)
     session.add(auth_session)
     await session.flush()
 
 
-async def get_user_permissions(session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID) -> set[str]:
+async def get_user_permissions(
+    session: AsyncSession, tenant_id: uuid.UUID, user_id: uuid.UUID
+) -> set[str]:
     statement = (
         select(Permission.code)
         .select_from(user_roles_table)

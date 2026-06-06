@@ -118,7 +118,9 @@ def test_create_student_validates_payload(
     mock_get_user_permissions: AsyncMock,
 ) -> None:
     mock_get_user_permissions.return_value = {"students.manage", "students.read"}
-    mock_get_school_by_id.return_value = SimpleNamespace(id=uuid.UUID("00000000-0000-0000-0000-000000000020"))
+    mock_get_school_by_id.return_value = SimpleNamespace(
+        id=uuid.UUID("00000000-0000-0000-0000-000000000020")
+    )
     mock_create_student.return_value = SimpleNamespace(
         id=uuid.UUID("00000000-0000-0000-0000-000000000010"),
         school_id=uuid.UUID("00000000-0000-0000-0000-000000000020"),

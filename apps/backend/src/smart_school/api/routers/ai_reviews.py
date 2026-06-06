@@ -6,23 +6,25 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from smart_school.ai_review import schemas as ai_schemas
+from smart_school.ai_review import services as ai_services
 from smart_school.auth.dependencies import (
     get_current_tenant,
-    get_current_user,
     get_session,
     require_permission,
 )
-from smart_school.ai_review import schemas as ai_schemas
-from smart_school.ai_review import services as ai_services
+from smart_school.models.identity import User
 from smart_school.models.tenant import Tenant
 
 router = APIRouter(prefix="/ai/reports", tags=["AI Reports"])
+ai_reports_read_permission = require_permission("ai_reports.read")
+ai_reports_manage_permission = require_permission("ai_reports.manage")
 
 
 @router.get("/queue", response_model=list[ai_schemas.AIReportRead])
 async def list_ai_review_queue(
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("ai_reports.read")),
+    _user: Annotated[User, Depends(ai_reports_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[ai_schemas.AIReportRead]:
     queue = await ai_services.list_queue(session, tenant.id)
@@ -33,7 +35,7 @@ async def list_ai_review_queue(
 async def read_ai_report(
     report_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("ai_reports.read")),
+    _user: Annotated[User, Depends(ai_reports_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> ai_schemas.AIReportRead:
     report = await ai_services.get_report(session, tenant.id, report_id)
@@ -46,7 +48,7 @@ async def read_ai_report(
 async def list_ai_review_history(
     report_id: uuid.UUID,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    _user=Depends(require_permission("ai_reports.read")),
+    _user: Annotated[User, Depends(ai_reports_read_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> list[ai_schemas.AIReviewActionRead]:
     history = await ai_services.list_history(session, tenant.id, report_id)
@@ -58,7 +60,7 @@ async def submit_ai_report_review(
     report_id: uuid.UUID,
     payload: ai_schemas.SubmitAIReviewRequest,
     tenant: Annotated[Tenant, Depends(get_current_tenant)] = None,
-    user=Depends(require_permission("ai_reports.manage")),
+    user: Annotated[User, Depends(ai_reports_manage_permission)] = None,
     session: Annotated[AsyncSession, Depends(get_session)] = None,
 ) -> ai_schemas.AIReportRead:
     try:

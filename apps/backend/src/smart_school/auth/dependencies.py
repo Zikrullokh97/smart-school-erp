@@ -7,13 +7,12 @@ from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from smart_school.auth.crud import get_user_by_id, get_user_permissions, get_tenant_by_slug
+from smart_school.auth.crud import get_tenant_by_slug, get_user_by_id, get_user_permissions
 from smart_school.auth.security import ACCESS_TOKEN_TYPE, decode_jwt_token
 from smart_school.db.session import get_session
 from smart_school.models.enums import UserStatus
 from smart_school.models.identity import User
 from smart_school.models.tenant import Tenant
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 

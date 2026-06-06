@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from smart_school.models.ai_reporting import AIReport
 from smart_school.models.ai_review import AIReviewAction
-from smart_school.models.enums import AIReviewDecision, AIReportStatus
+from smart_school.models.enums import AIReportStatus, AIReviewDecision
 
 
-async def get_report_by_id(session: AsyncSession, tenant_id: uuid.UUID, report_id: uuid.UUID) -> AIReport | None:
+async def get_report_by_id(
+    session: AsyncSession, tenant_id: uuid.UUID, report_id: uuid.UUID
+) -> AIReport | None:
     result = await session.execute(select(AIReport).filter_by(tenant_id=tenant_id, id=report_id))
     return result.scalar_one_or_none()
 
@@ -25,7 +28,9 @@ async def list_review_queue(session: AsyncSession, tenant_id: uuid.UUID) -> list
     return result.scalars().all()
 
 
-async def list_review_history(session: AsyncSession, tenant_id: uuid.UUID, report_id: uuid.UUID) -> list[AIReviewAction]:
+async def list_review_history(
+    session: AsyncSession, tenant_id: uuid.UUID, report_id: uuid.UUID
+) -> list[AIReviewAction]:
     result = await session.execute(
         select(AIReviewAction)
         .filter_by(tenant_id=tenant_id, ai_report_id=report_id)

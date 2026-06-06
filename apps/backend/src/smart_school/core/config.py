@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import secrets
 from functools import lru_cache
 from pathlib import Path
-import secrets
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict

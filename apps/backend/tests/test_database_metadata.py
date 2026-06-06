@@ -61,8 +61,7 @@ def test_tenant_scoped_tables_have_tenant_index_or_unique_scope() -> None:
     for table_name in TENANT_SCOPED_TABLES:
         table = Base.metadata.tables[table_name]
         has_tenant_index = any(
-            "tenant_id" in [column.name for column in index.columns]
-            for index in table.indexes
+            "tenant_id" in [column.name for column in index.columns] for index in table.indexes
         )
         has_tenant_unique = any(
             isinstance(constraint, UniqueConstraint)
