@@ -32,8 +32,11 @@ class ThemeSettings {
   }
 }
 
-class SettingsController extends StateNotifier<ThemeSettings> {
-  SettingsController() : super(const ThemeSettings());
+class SettingsController extends Notifier<ThemeSettings> {
+  @override
+  ThemeSettings build() {
+    return const ThemeSettings();
+  }
 
   void setHighContrast(bool value) => state = state.copyWith(highContrast: value);
 
@@ -46,5 +49,6 @@ class SettingsController extends StateNotifier<ThemeSettings> {
   void setBackgroundSync(bool value) => state = state.copyWith(backgroundSync: value);
 }
 
-final settingsControllerProvider =
-    StateNotifierProvider<SettingsController, ThemeSettings>((ref) => SettingsController());
+final settingsControllerProvider = NotifierProvider<SettingsController, ThemeSettings>(
+  () => SettingsController(),
+);

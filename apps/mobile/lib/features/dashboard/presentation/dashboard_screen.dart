@@ -10,7 +10,8 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final session = ref.watch(authControllerProvider).valueOrNull;
+    final authState = ref.watch(authControllerProvider);
+    final session = authState.asData?.value;
     final width = MediaQuery.sizeOf(context).width;
     final columns = width >= 1000 ? 3 : width >= 640 ? 2 : 1;
 

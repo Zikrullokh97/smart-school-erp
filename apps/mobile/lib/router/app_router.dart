@@ -15,7 +15,7 @@ import '../shared/widgets/app_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
-  final signedIn = authState.valueOrNull != null;
+  final signedIn = authState.asData?.value != null;
 
   return GoRouter(
     initialLocation: '/login',

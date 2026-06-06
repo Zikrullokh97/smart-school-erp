@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../application/auth_controller.dart';
+import '../../../shared/models/user_session.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -27,8 +28,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authControllerProvider, (previous, next) {
-      if (next.hasValue && next.value != null) {
+    ref.listen<AsyncValue<UserSession?>>(authControllerProvider, (previous, next) {
+      // Use AsyncData type check to satisfy analyzer null-safety
+      if (next is AsyncData<UserSession?> && next.value != null) {
         context.go('/dashboard');
       }
     });

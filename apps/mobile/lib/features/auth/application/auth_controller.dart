@@ -11,15 +11,18 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   );
 });
 
-final authControllerProvider =
-    StateNotifierProvider<AuthController, AsyncValue<UserSession?>>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider));
+final authControllerProvider = NotifierProvider<AuthController, AsyncValue<UserSession?>>(() {
+  return AuthController();
 });
 
-class AuthController extends StateNotifier<AsyncValue<UserSession?>> {
-  AuthController(this._repository) : super(const AsyncValue.data(null));
+class AuthController extends Notifier<AsyncValue<UserSession?>> {
+  late final AuthRepository _repository;
 
-  final AuthRepository _repository;
+  @override
+  AsyncValue<UserSession?> build() {
+    _repository = ref.watch(authRepositoryProvider);
+    return const AsyncValue.data(null);
+  }
 
   Future<void> login({
     required String tenantSlug,
@@ -27,9 +30,13 @@ class AuthController extends StateNotifier<AsyncValue<UserSession?>> {
     required String password,
   }) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => _repository.login(tenantSlug: tenantSlug, email: email, password: password),
-    );
+    state = await AsyncValue.guard<UserSession?>(() async {
+      return await _repository.login(
+        tenantSlug: tenantSlug,
+        email: email,
+        password: password,
+      );
+    });
   }
 
   Future<void> logout() async {
